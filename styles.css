@@ -92,20 +92,20 @@ h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; letter-spacin
 }
 @keyframes sheen { from { background-position: 120% 0; } to { background-position: -120% 0; } }
 .antarpaat__zari {
-  position: absolute; inset: clamp(12px, 2.6vmin, 30px);
+  position: absolute; inset: 64px var(--edge) var(--edge); /* top edge clears the top bar */
   border: clamp(10px, 2.2vmin, 24px) solid;
   border-image: repeating-linear-gradient(45deg, #e3a82b 0 5px, #9a6a24 5px 9px, #f3cd6a 9px 11px, #9a6a24 11px 15px) 24;
 }
 .antarpaat__zari::after { content: ""; position: absolute; inset: clamp(8px, 1.4vmin, 16px); border: 1px solid rgba(227,168,43,.65); }
-.antarpaat { --ring: min(80vmin, 680px, calc(100svh - 190px)); }
-.antarpaat__motif { position: absolute; left: 50%; top: 50%; width: var(--ring); transform: translate(-50%, -50%); opacity: .9; }
+.antarpaat { --edge: clamp(12px, 2.6vmin, 30px); --shift: calc((64px - var(--edge)) / 2); --ring: min(80vmin, 680px, calc(100svh - 220px)); }
+.antarpaat__motif { position: absolute; left: 50%; top: calc(50% + var(--shift)); width: var(--ring); transform: translate(-50%, -50%); opacity: .9; }
 .antarpaat__motif g { transform-origin: 200px 200px; }
 .petal-ring { animation: turn 90s linear infinite; }
 @keyframes turn { to { transform: rotate(360deg); } }
 /* The two big lines are centred on the exact point the lotus ring is centred on.
    The small line hangs above them, outside the centring calculation. */
 .antarpaat__words {
-  position: absolute; left: 50%; top: 50%;
+  position: absolute; left: 50%; top: calc(50% + var(--shift));
   transform: translate(-50%, calc(-50% + var(--optical, 0px)));
   display: flex; flex-direction: column; align-items: center; text-align: center;
   white-space: nowrap;
@@ -139,7 +139,12 @@ h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; letter-spacin
 
 @media (max-width: 720px) {
   .triptych { grid-template-columns: 1fr; }
-  .triptych figure:not(:nth-child(2)) { display: none; }
+  .triptych figure:not(:nth-child(1)) { display: none; }   /* bridal portrait: no lettering in the photo */
+  .triptych figure:nth-child(1) img { object-position: 50% 22%; }
+  .mandap__shade { background: linear-gradient(to top, rgba(20,11,9,.92) 0%, rgba(20,11,9,.55) 32%, rgba(20,11,9,0) 55%, rgba(20,11,9,.45) 100%); }
+  .mandap__title { bottom: 5vh; }
+  .mandap__title h1 { font-size: clamp(2.8rem, 14vw, 4.2rem); line-height: .95; }
+  .mandap__kicker { font-size: .7rem; letter-spacing: .16em; }
 }
 
 /* ---------------- 2. Statement ---------------- */

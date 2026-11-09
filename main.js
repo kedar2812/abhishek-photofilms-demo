@@ -298,8 +298,8 @@ function opticalCentre() {
     wrap.style.setProperty('--optical', '0px');
     const lines = [...wrap.querySelectorAll('.antarpaat__big')].map(inkOf);
     const inkMid = (Math.min(...lines.map(l => l.top)) + Math.max(...lines.map(l => l.bot))) / 2;
-    const stage = document.querySelector('.antarpaat').getBoundingClientRect();
-    const target = stage.top + stage.height / 2; // the ring is centred on the cloth
+    const frame = document.querySelector('.antarpaat__zari').getBoundingClientRect();
+    const target = frame.top + frame.height / 2; // centre of the zari frame, where the ring sits
     wrap.style.setProperty('--optical', (target - inkMid).toFixed(2) + 'px');
   };
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => {
