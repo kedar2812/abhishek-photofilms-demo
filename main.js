@@ -294,19 +294,31 @@ function opticalCentre() {
     for (let y = cv.height - 1; y >= 0 && b < 0; y--) for (let i = 0; i < cv.width; i++) if (d[(y * cv.width + i) * 4 + 3] > 40) { b = y; break; }
     return { top: baseline - (by - t), bot: baseline + (b - by) };
   };
+  const SAMPLE = 'शुभमंगल सावधान';
+  const fontReady = () => !document.fonts || document.fonts.check('40px "Rozha One"', SAMPLE);
   const run = () => {
+    // Never measure the fallback font: its ink sits completely differently.
+    if (!fontReady()) { wrap.style.setProperty('--optical', '0px'); return; }
     wrap.style.setProperty('--optical', '0px');
-    const lines = [...wrap.querySelectorAll('.antarpaat__big')].map(inkOf);
-    const inkMid = (Math.min(...lines.map(l => l.top)) + Math.max(...lines.map(l => l.bot))) / 2;
+    const lines = [...wrap.querySelectorAll('.antarpaat__big')];
+    const fs = parseFloat(getComputedStyle(lines[0]).fontSize);
+    const ink = lines.map(inkOf);
+    const inkMid = (Math.min(...ink.map(l => l.top)) + Math.max(...ink.map(l => l.bot))) / 2;
     const frame = document.querySelector('.antarpaat__zari').getBoundingClientRect();
     const target = frame.top + frame.height / 2; // centre of the zari frame, where the ring sits
-    wrap.style.setProperty('--optical', (target - inkMid).toFixed(2) + 'px');
+    // optical correction is a small nudge; anything larger means a bad measurement
+    const off = Math.max(-fs * .15, Math.min(fs * .15, target - inkMid));
+    wrap.style.setProperty('--optical', off.toFixed(2) + 'px');
   };
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => {
-    // wait for the entrance tween on the words to settle so measurements are true
-    setTimeout(run, 50);
-    let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 150); });
-  });
+  let t;
+  const later = (ms = 60) => { clearTimeout(t); t = setTimeout(run, ms); };
+  if (document.fonts) {
+    document.fonts.load('40px "Rozha One"', SAMPLE).then(() => later(), () => later());
+    document.fonts.addEventListener('loadingdone', () => later());
+    document.fonts.ready.then(() => later());
+  } else later();
+  addEventListener('load', () => later());
+  addEventListener('resize', () => later(150));
 }
 
 /* ---------- Lotus ring on the antarpaat ---------- */
