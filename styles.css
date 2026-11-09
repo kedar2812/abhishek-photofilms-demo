@@ -97,19 +97,30 @@ h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; letter-spacin
   border-image: repeating-linear-gradient(45deg, #e3a82b 0 5px, #9a6a24 5px 9px, #f3cd6a 9px 11px, #9a6a24 11px 15px) 24;
 }
 .antarpaat__zari::after { content: ""; position: absolute; inset: clamp(8px, 1.4vmin, 16px); border: 1px solid rgba(227,168,43,.65); }
-.antarpaat__motif { position: absolute; left: 50%; top: 50%; width: min(80vmin, 680px); transform: translate(-50%, -50%); opacity: .9; }
+.antarpaat { --ring: min(80vmin, 680px, calc(100svh - 190px)); }
+.antarpaat__motif { position: absolute; left: 50%; top: 50%; width: var(--ring); transform: translate(-50%, -50%); opacity: .9; }
 .antarpaat__motif g { transform-origin: 200px 200px; }
 .petal-ring { animation: turn 90s linear infinite; }
 @keyframes turn { to { transform: rotate(360deg); } }
-.antarpaat__words { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.antarpaat__small { font-family: var(--display); color: var(--haldi); font-size: clamp(1rem, 2.4vmin, 1.4rem); letter-spacing: .08em; margin-bottom: 1.2vmin; opacity: .85; }
+/* The two big lines are centred on the exact point the lotus ring is centred on.
+   The small line hangs above them, outside the centring calculation. */
+.antarpaat__words {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, calc(-50% + var(--optical, 0px)));
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  white-space: nowrap;
+}
+.antarpaat__small {
+  position: absolute; left: 0; right: 0; bottom: 100%; margin-bottom: 1.6vmin;
+  font-family: var(--display); color: var(--haldi); font-size: max(.8rem, calc(var(--ring) * .03)); letter-spacing: .08em; opacity: .85;
+}
 .antarpaat__big {
-  font-family: var(--display); font-size: clamp(3rem, 12vmin, 9rem); line-height: 1.05;
+  font-family: var(--display); font-size: calc(var(--ring) * .15); line-height: 1.05;
   background: linear-gradient(180deg, #ffe39a 0%, #e3a82b 45%, #a8711f 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: drop-shadow(0 2px 0 rgba(60,8,10,.6));
 }
-.antarpaat__big--2 { font-size: clamp(2.4rem, 9vmin, 7rem); }
+.antarpaat__big--2 { font-size: calc(var(--ring) * .112); }
 .antarpaat__fringe {
   position: absolute; left: 0; right: 0; bottom: -26px; height: 26px;
   background: repeating-linear-gradient(90deg, #d9a136 0 2px, transparent 2px 9px);
@@ -119,7 +130,9 @@ h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; letter-spacin
   position: absolute; left: 50%; bottom: 3.2vh; transform: translateX(-50%); z-index: 4; margin: 0;
   display: flex; flex-direction: column; align-items: center; gap: .6rem;
   color: var(--haldi); font-size: .82rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+  text-align: center; white-space: nowrap;
 }
+@media (max-width: 480px) { .mandap__hint { font-size: .68rem; letter-spacing: .1em; } }
 .mandap__hint i { width: 1px; height: 34px; background: rgba(227,168,43,.3); position: relative; overflow: hidden; }
 .mandap__hint i::after { content: ""; position: absolute; inset: 0; background: var(--haldi); animation: drip 1.8s cubic-bezier(.65,0,.35,1) infinite; }
 @keyframes drip { from { transform: translateY(-100%); } to { transform: translateY(100%); } }

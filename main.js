@@ -9,6 +9,7 @@
 
   buildPetals();
   initEnquiry();
+  opticalCentre();
 
   if (!ok) {
     document.documentElement.classList.add('no-motion');
@@ -263,6 +264,49 @@ function makeAkshata(canvas) {
     if (grains.length) requestAnimationFrame(step); else { running = false; ctx.clearRect(0, 0, W, H); }
   }
   return { burst };
+}
+
+/* ---------- Optical centring of "शुभमंगल सावधान" ----------
+   Devanagari ink sits unevenly inside its line box (shirorekha, anusvara,
+   lower matras), so box-centring looks off. Measure the real ink of both
+   lines and shift the block until the ink is centred on the lotus ring. */
+function opticalCentre() {
+  const wrap = document.querySelector('.antarpaat__words');
+  const motif = document.querySelector('.antarpaat__motif');
+  if (!wrap || !motif) return;
+  const inkOf = el => {
+    const cs = getComputedStyle(el), fs = parseFloat(cs.fontSize);
+    const mark = document.createElement('i');
+    mark.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+    el.appendChild(mark);
+    // baseline from layout positions only, so entrance/scroll transforms don't skew it
+    const baseline = wrap.getBoundingClientRect().top + el.offsetTop + (mark.getBoundingClientRect().top - el.getBoundingClientRect().top);
+    mark.remove();
+    const cv = document.createElement('canvas');
+    cv.width = Math.ceil(el.getBoundingClientRect().width) + 40; cv.height = Math.ceil(fs * 3);
+    const x = cv.getContext('2d');
+    x.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const by = Math.round(fs * 1.8);
+    x.fillText(el.textContent, 20, by);
+    const d = x.getImageData(0, 0, cv.width, cv.height).data;
+    let t = -1, b = -1;
+    for (let y = 0; y < cv.height && t < 0; y++) for (let i = 0; i < cv.width; i++) if (d[(y * cv.width + i) * 4 + 3] > 40) { t = y; break; }
+    for (let y = cv.height - 1; y >= 0 && b < 0; y--) for (let i = 0; i < cv.width; i++) if (d[(y * cv.width + i) * 4 + 3] > 40) { b = y; break; }
+    return { top: baseline - (by - t), bot: baseline + (b - by) };
+  };
+  const run = () => {
+    wrap.style.setProperty('--optical', '0px');
+    const lines = [...wrap.querySelectorAll('.antarpaat__big')].map(inkOf);
+    const inkMid = (Math.min(...lines.map(l => l.top)) + Math.max(...lines.map(l => l.bot))) / 2;
+    const stage = document.querySelector('.antarpaat').getBoundingClientRect();
+    const target = stage.top + stage.height / 2; // the ring is centred on the cloth
+    wrap.style.setProperty('--optical', (target - inkMid).toFixed(2) + 'px');
+  };
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => {
+    // wait for the entrance tween on the words to settle so measurements are true
+    setTimeout(run, 50);
+    let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 150); });
+  });
 }
 
 /* ---------- Lotus ring on the antarpaat ---------- */
